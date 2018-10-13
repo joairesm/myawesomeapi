@@ -59,3 +59,6 @@ typings/
 
 # next.js build output
 .next
+functions/Models/model.js
+functions/Models/.DS_Store
+functions/Models/model.json

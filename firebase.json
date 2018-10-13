@@ -1,0 +1,22 @@
+{
+  "hosting": {
+    "public": "public",
+    "rewrites":[{
+      "source": "/home",
+      "function": "app"
+    },
+    {
+      "source": "/spotify/latest",
+      "function": "app"
+    },
+    {
+      "source": "/spotify/code",
+      "function": "app"
+    }],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
