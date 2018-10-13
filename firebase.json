@@ -12,6 +12,14 @@
     {
       "source": "/spotify/code",
       "function": "app"
+    },
+    {
+      "source": "/instagram/latest",
+      "function": "app"
+    },
+    {
+      "source": "/instagram/code",
+      "function": "app"
     }],
     "ignore": [
       "firebase.json",
