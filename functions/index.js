@@ -104,7 +104,7 @@ app.get('/instagram/code', function(req, res) {
         var options = { method: 'GET',
             url: 'https://api.instagram.com/v1/users/self/media/recent/',
             qs: { access_token: parsed.access_token,
-                   callback: 'callbackFunction' },
+                   callback: '__ng_jsonp__.__req0.finished' },
             headers: 
             { 'Content-Type': 'application/json',
                 Accept: 'application/json' } };
@@ -121,4 +121,3 @@ app.get('/instagram/code', function(req, res) {
 });
 
 exports.app = functions.https.onRequest(app)
-//?access_token=1924378416.d71d1fd.48fe6105b818419181b0d5c18f69aab0&callback=callbackFunction
