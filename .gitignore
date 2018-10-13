@@ -62,3 +62,4 @@ typings/
 functions/Models/model.js
 functions/Models/.DS_Store
 functions/Models/model.json
+*.cache
