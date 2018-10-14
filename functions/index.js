@@ -5,10 +5,10 @@ var libjs = require('./Models/model.json');
 const sptf_my_client_id = libjs.sptf_my_client_id;
 const sptf_my_client_secret = libjs.sptf_my_client_secret;
 const sptf_redirect_uri = libjs.sptf_redirect_uri_2;
-
 const inst_my_client_id = libjs.inst_my_client_id;
 const inst_my_client_secret = libjs.inst_my_client_secret;
 const inst_redirect_uri = libjs.inst_redirect_uri_2;
+const sec_code = libjs.sec_code;
 
 var accesstoken;
 var finalresponse;
@@ -24,6 +24,12 @@ app.get('/home', (req,res) => {
 });
 
 spotify_app.get('/spotify/latest', function(req, res) {
+    var thecode = req.param('sec_code');
+    if(thecode != sec_code){
+        res.send('Stay away boy');
+        return;
+    }
+
     var scopes = 'user-read-recently-played';
     res.redirect('https://accounts.spotify.com/authorize' +
       '?response_type=code' +
@@ -76,6 +82,11 @@ spotify_app.get('/spotify/code', function(req, res) {
 });
 
 instagram_app.get('/instagram/latest', function(req, res) {
+    var thecode = req.param('sec_code');
+    if(thecode != sec_code){
+        res.send('Stay away boy');
+        return;
+    }
     res.redirect('https://api.instagram.com/oauth/authorize/?client_id=' +
     inst_my_client_id +
     '&redirect_uri='+
