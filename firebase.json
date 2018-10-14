@@ -7,19 +7,19 @@
     },
     {
       "source": "/spotify/latest",
-      "function": "app"
+      "function": "spotify_app"
     },
     {
       "source": "/spotify/code",
-      "function": "app"
+      "function": "spotify_app"
     },
     {
       "source": "/instagram/latest",
-      "function": "app"
+      "function": "instagram_app"
     },
     {
       "source": "/instagram/code",
-      "function": "app"
+      "function": "instagram_app"
     }],
     "ignore": [
       "firebase.json",

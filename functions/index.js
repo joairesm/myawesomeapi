@@ -15,11 +15,15 @@ var finalresponse;
 
 app = express();
 
+spotify_app = express();
+
+instagram_app = express();
+
 app.get('/home', (req,res) => {
     res.send('hi! This is my personal API');
 });
 
-app.get('/spotify/latest', function(req, res) {
+spotify_app.get('/spotify/latest', function(req, res) {
     var scopes = 'user-read-recently-played';
     res.redirect('https://accounts.spotify.com/authorize' +
       '?response_type=code' +
@@ -28,7 +32,7 @@ app.get('/spotify/latest', function(req, res) {
       '&redirect_uri=' + encodeURIComponent(sptf_redirect_uri));
 });
 
-app.get('/spotify/code', function(req, res) {
+spotify_app.get('/spotify/code', function(req, res) {
 
     var thecode = req.param('code');
     var request = require("request");
@@ -53,7 +57,9 @@ app.get('/spotify/code', function(req, res) {
 
         var options = { method: 'GET',
             url: 'https://api.spotify.com/v1/me/player/recently-played',
-            qs: { limit: '3' },
+            qs: { 
+                limit: '3'
+            },
             headers: 
             { Authorization: 'Bearer ' + parsed.access_token,
                 'Content-Type': 'application/json',
@@ -62,15 +68,14 @@ app.get('/spotify/code', function(req, res) {
         request(options, function (error, _response, body) {
             if (error) throw new Error(error);
         
-            finalresponse = body;
-
+            finalresponse = '/**/ __ng_jsonp__.__req0.finished('+body+')';
             res.send(finalresponse);
 
         });
     });
 });
 
-app.get('/instagram/latest', function(req, res) {
+instagram_app.get('/instagram/latest', function(req, res) {
     res.redirect('https://api.instagram.com/oauth/authorize/?client_id=' +
     inst_my_client_id +
     '&redirect_uri='+
@@ -78,7 +83,7 @@ app.get('/instagram/latest', function(req, res) {
     '&response_type=code');
 });
 
-app.get('/instagram/code', function(req, res) {
+instagram_app.get('/instagram/code', function(req, res) {
 
     var thecode = req.param('code');
     var request = require("request");
@@ -104,7 +109,8 @@ app.get('/instagram/code', function(req, res) {
         var options = { method: 'GET',
             url: 'https://api.instagram.com/v1/users/self/media/recent/',
             qs: { access_token: parsed.access_token,
-                   callback: '__ng_jsonp__.__req0.finished' },
+                   callback: '__ng_jsonp__.__req1.finished' 
+                },
             headers: 
             { 'Content-Type': 'application/json',
                 Accept: 'application/json' } };
@@ -121,3 +127,5 @@ app.get('/instagram/code', function(req, res) {
 });
 
 exports.app = functions.https.onRequest(app)
+exports.spotify_app = functions.https.onRequest(spotify_app)
+exports.instagram_app = functions.https.onRequest(instagram_app)
