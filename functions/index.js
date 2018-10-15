@@ -4,28 +4,42 @@ var libjs = require('./Models/model.json');
 
 const sptf_my_client_id = libjs.sptf_my_client_id;
 const sptf_my_client_secret = libjs.sptf_my_client_secret;
-const sptf_redirect_uri = libjs.sptf_redirect_uri_2;
+const sptf_redirect_uri = libjs.sptf_redirect_uri;
 const inst_my_client_id = libjs.inst_my_client_id;
 const inst_my_client_secret = libjs.inst_my_client_secret;
-const inst_redirect_uri = libjs.inst_redirect_uri_2;
+const inst_redirect_uri = libjs.inst_redirect_uri;
 const sec_code = libjs.sec_code;
+const sec_setup = libjs.sec_setup;
+const spotifyToken = libjs.SptfrfToken;
+const instaToken = libjs.InstToken;
 
-var accesstoken;
 var finalresponse;
 
 app = express();
-
 spotify_app = express();
-
 instagram_app = express();
+
+spotify_app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
+
+instagram_app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
 
 app.get('/home', (req,res) => {
     res.send('hi! This is my personal API');
 });
 
-spotify_app.get('/spotify/latest', function(req, res) {
-    var thecode = req.param('sec_code');
-    if(thecode != sec_code){
+spotify_app.get('/spotify/setup', function(req, res) {
+    var thecode = req.param('sec_setup');
+    if(thecode != sec_setup){
         res.send('Stay away boy');
         return;
     }
@@ -56,34 +70,64 @@ spotify_app.get('/spotify/code', function(req, res) {
 
     request(options, function (error, _response, body) {
         if (error) throw new Error(error);
-        accesstoken = body;
+        var parsed = JSON.parse(body);
+        
+        console.log(parsed.refresh_token);
+        res.send('success!');
+        
+    });
+});
 
-        var parsed = JSON.parse(accesstoken);
+spotify_app.get('/spotify/latest', function(req, res){
+    var thecode = req.param('sec_code');
+    if(thecode != sec_code){
+        res.send('Stay away boy');
+        return;
+    }
+
+    var b = new Buffer(sptf_my_client_id + ":" + sptf_my_client_secret);
+    var s = b.toString('base64');
+
+    var auth = "Basic " + s;
+
+    var request = require("request");
+    var options = { method: 'POST',
+        url: 'https://accounts.spotify.com/api/token',
+        headers: 
+        { 'Authorization' :  auth },
+        form: 
+        {   grant_type: 'refresh_token',
+            refresh_token : spotifyToken 
+        } };
+
+    request(options, function (error, _response, body) {
+        if (error) throw new Error(error);
+        var parsed = JSON.parse(body);
+        
+        console.log(parsed.access_token);
+        
         var request = require("request");
-
         var options = { method: 'GET',
             url: 'https://api.spotify.com/v1/me/player/recently-played',
             qs: { 
-                limit: '3'
+                limit: '1'
             },
             headers: 
             { Authorization: 'Bearer ' + parsed.access_token,
                 'Content-Type': 'application/json',
                 Accept: 'application/json' } };
         
-        request(options, function (error, _response, body) {
+        request(options, function (error, _r, _b) {
             if (error) throw new Error(error);
-        
-            finalresponse = '/**/ __ng_jsonp__.__req0.finished('+body+')';
-            res.send(finalresponse);
+            res.send(_b);
 
         });
     });
 });
 
-instagram_app.get('/instagram/latest', function(req, res) {
-    var thecode = req.param('sec_code');
-    if(thecode != sec_code){
+instagram_app.get('/instagram/setup', function(req, res) {
+    var thecode = req.param('sec_setup');
+    if(thecode != sec_setup){
         res.send('Stay away boy');
         return;
     }
@@ -112,16 +156,27 @@ instagram_app.get('/instagram/code', function(req, res) {
 
     request(options, function (error, _response, body) {
         if (error) throw new Error(error);
-        accesstoken = body;
 
-        var parsed = JSON.parse(accesstoken);
+        var parsed = JSON.parse(body);
+        console.log(parsed.access_token);
+
+        res.send('success!');
+        
+    });
+});
+
+instagram_app.get('/instagram/latest', function(req, res) {
+        var thecode = req.param('sec_code');
+        if(thecode != sec_code){
+            res.send('Stay away boy');
+            return;
+        }
+        
         var request = require("request");
 
         var options = { method: 'GET',
             url: 'https://api.instagram.com/v1/users/self/media/recent/',
-            qs: { access_token: parsed.access_token,
-                   callback: '__ng_jsonp__.__req1.finished' 
-                },
+            qs: { access_token: instaToken },
             headers: 
             { 'Content-Type': 'application/json',
                 Accept: 'application/json' } };
@@ -134,7 +189,7 @@ instagram_app.get('/instagram/code', function(req, res) {
             res.send(finalresponse);
 
         });
-    });
+    
 });
 
 exports.app = functions.https.onRequest(app)

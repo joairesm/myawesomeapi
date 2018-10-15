@@ -6,7 +6,7 @@
       "function": "app"
     },
     {
-      "source": "/spotify/latest",
+      "source": "/spotify/setup",
       "function": "spotify_app"
     },
     {
@@ -14,11 +14,19 @@
       "function": "spotify_app"
     },
     {
-      "source": "/instagram/latest",
+      "source": "/spotify/latest",
+      "function": "spotify_app"
+    },
+    {
+      "source": "/instagram/setup",
       "function": "instagram_app"
     },
     {
       "source": "/instagram/code",
+      "function": "instagram_app"
+    },
+    {
+      "source": "/instagram/latest",
       "function": "instagram_app"
     }],
     "ignore": [
