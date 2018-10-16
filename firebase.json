@@ -6,28 +6,16 @@
       "function": "app"
     },
     {
-      "source": "/spotify/setup",
-      "function": "spotify_app"
-    },
-    {
-      "source": "/spotify/code",
-      "function": "spotify_app"
-    },
-    {
       "source": "/spotify/latest",
       "function": "spotify_app"
     },
     {
-      "source": "/instagram/setup",
-      "function": "instagram_app"
-    },
-    {
-      "source": "/instagram/code",
-      "function": "instagram_app"
-    },
-    {
       "source": "/instagram/latest",
       "function": "instagram_app"
+    },
+    {
+      "source": "/twitter/latest",
+      "function": "twitter_app"
     }],
     "ignore": [
       "firebase.json",
