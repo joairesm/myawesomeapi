@@ -12,12 +12,16 @@ const sec_code = libjs.sec_code;
 const sec_setup = libjs.sec_setup;
 const spotifyToken = libjs.SptfrfToken;
 const instaToken = libjs.InstToken;
+const twttr_consumer_key = libjs.twttr_consumer_key;
+const twttr_consumer_secret = libjs.twttr_consumer_secret;
+const twttrToken = libjs.twttrToken;
 
 var finalresponse;
 
 app = express();
 spotify_app = express();
 instagram_app = express();
+twitter_app = express();
 
 spotify_app.use((req, res, next) => {
     res.append('Access-Control-Allow-Origin', ['*']);
@@ -27,6 +31,13 @@ spotify_app.use((req, res, next) => {
 });
 
 instagram_app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
+
+twitter_app.use((req, res, next) => {
     res.append('Access-Control-Allow-Origin', ['*']);
     res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.append('Access-Control-Allow-Headers', 'Content-Type');
@@ -192,6 +203,70 @@ instagram_app.get('/instagram/latest', function(req, res) {
     
 });
 
+twitter_app.get('/twitter/setup', function(req, res) {
+    var thecode = req.param('sec_setup');
+    if(thecode != sec_setup){
+        res.send('Stay away boy');
+        return;
+    }
+
+    var request = require("request");
+
+    var b = new Buffer(encodeURIComponent(twttr_consumer_key) + ":" + encodeURIComponent(twttr_consumer_secret));
+    var s = b.toString('base64');
+
+    var auth = "Basic " + s;
+    var options = { method: 'POST',
+        url: 'https://api.twitter.com/oauth2/token',
+        headers: 
+        { 'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': auth
+        },
+        form: 
+        { grant_type: 'client_credentials'} };
+
+    request(options, function (error, _response, body) {
+        if (error) throw new Error(error);
+
+        var parsed = JSON.parse(body);
+        console.log(parsed.access_token);
+
+        res.send('success!');
+        
+    });
+
+    
+});
+
+
+twitter_app.get('/twitter/latest', function(req, res) {
+        var thecode = req.param('sec_code');
+        if(thecode != sec_code){
+            res.send('Stay away boy');
+            return;
+        }
+        
+        var request = require("request");
+
+        var options = { method: 'GET',
+            url: 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=joairesm&count=1',
+            
+            headers: 
+            { Authorization: 'Bearer ' + twttrToken,
+            'Content-Type': 'application/json',
+            Accept: 'application/json' } };
+        
+        request(options, function (error, _response, body) {
+            if (error) throw new Error(error);
+        
+            finalresponse = body;
+
+            res.send(finalresponse);
+
+        });
+});
+
 exports.app = functions.https.onRequest(app)
 exports.spotify_app = functions.https.onRequest(spotify_app)
 exports.instagram_app = functions.https.onRequest(instagram_app)
+exports.twitter_app = functions.https.onRequest(twitter_app)
